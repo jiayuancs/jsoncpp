@@ -1,0 +1,38 @@
+{
+  // 使用 IntelliSense 了解相关属性。 
+  // 悬停以查看现有属性的描述。
+  // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "编译项目，并调试或运行",
+      "type": "cppdbg",
+      "request": "launch",
+      // 生成的可执行文件的路径
+      "program": "${workspaceFolder}/build/bin/jsoncpp_test",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${fileDirname}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "miDebuggerPath": "/usr/bin/gdb",
+      "setupCommands": [
+        {
+          "description": "为 gdb 启用整齐打印",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        },
+        {
+          "description": "将反汇编风格设置为 Intel",
+          "text": "-gdb-set disassembly-flavor intel",
+          "ignoreFailures": true
+        }
+      ],
+      // 调试之前需要做的任务(与tasks.json文件中的label字段对应)
+      // 如果不需要执行这些任务，只对现有的可执行程序进行调试，
+      // 则可注释掉该字段
+      "preLaunchTask": "task-build-project"
+    }
+  ]
+}
