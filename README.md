@@ -3,6 +3,7 @@
 ## TODO
 
 - [ ] dump实现缩进
+- [ ] 针对转义字符，dump应该输出带有反斜杠的字符，而不是转义字符实际代表的字符
 - [ ] 实现bool、long long、double、string的基本运算，示例如下：
   ```C++
   json j = 42;
@@ -11,6 +12,10 @@
   j += " world";
   ```
 - [ ] 实现JSON解析器，能够从流中读取JSON字符串并解析为`Json`对象
+- [ ] 暂不支持`\u`转义字符
+- [ ] 完成ParserArray和ParserObject
+- [ ] valgrind测试不通过
+
 
 ## 环境
 
@@ -142,4 +147,24 @@ void dump(std::ostream &os, unsigned indent = 0) const;
 
 ```C++
 std::cout << json_object;
+```
+
+### 注意
+
+`jsoncpp`使用**前缀匹配**，前缀匹配成功时会自动返回，不再读取后面的字符
+
+```C++
+Json json;
+
+json = Parser("nulll").Parse();  // 匹配前缀null，得到null类型
+
+json = Parser("truea").Parse();  // 匹配前缀true，得到bool类型
+
+json = Parser("falsee").Parse(); // 匹配前缀false，得到bool类型
+
+json = Parser("43224fa34").Parse();  // 匹配前缀43224，得到integer类型
+
+json = Parser("432.24fa34").Parse(); // 匹配前缀432.24，得到double类型
+
+json = Parser("\"hello world\"sdfj").Parse();  // 匹配前缀"hello world"，得到string类型
 ```
