@@ -127,10 +127,19 @@ Json &Json::operator[](const int index) {
     throw std::logic_error(
         "function Josn::operator[](const int) requires index > 0");
   }
+
+  // null类型可转为array
+  if (type_ == kNull) {
+    type_ = kArray;
+    array_pointer_ = new ArrayType();
+  }
+
   if (type_ != kArray) {
     throw std::logic_error(
-        "function Josn::operator[](const int) type error, requires array");
+        "function Josn::operator[](const int) type error, requires array or "
+        "null");
   }
+
   if (index < array_pointer_->size()) {
     return (*array_pointer_)[index];
   }
@@ -146,11 +155,18 @@ Json &Json::operator[](const int index) {
 Json &Json::operator[](const char *key) { return (*this)[std::string(key)]; }
 
 Json &Json::operator[](const std::string &key) {
+  // null类型可转为object
+  if (type_ == kNull) {
+    type_ = kObject;
+    object_pointer_ = new ObjectType();
+  }
+
   if (type_ != kObject) {
     throw std::logic_error(
         "function Json::operator[](const string &) type error, requires "
-        "object");
+        "object or null");
   }
+
   return (*object_pointer_)[key];
 }
 

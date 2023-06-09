@@ -2,17 +2,15 @@
 
 ## TODO
 
-- 编写测试用例
-- null类型应可以使用`[]`自动转换为`array`或`object`类型而不抛出异常
-- dump实现缩进
-- 实现bool、long long、double、string的基本运算，示例如下：
+- [ ] dump实现缩进
+- [ ] 实现bool、long long、double、string的基本运算，示例如下：
   ```C++
   json j = 42;
   j += 2;
   j = "hello"
   j += " world";
   ```
-- 实现JSON解析器，能够从流中读取JSON字符串并解析为`Json`对象
+- [ ] 实现JSON解析器，能够从流中读取JSON字符串并解析为`Json`对象
 
 ## 环境
 
@@ -55,7 +53,7 @@ j = "hello json"; // string类型
 
 j = {42, 3.14, false, "json"};  // array类型
 
-j = Json::ObjectType{{"type", "json", "value", 42}};  // object类型
+j = Json::ObjectType{{"type", "json"}, {"value", 42}};  // object类型
 ```
 
 ### array类型
@@ -73,7 +71,7 @@ j[32] = 4224;     // j[3:32]自动填充为null类型
 ##### 方式二
 
 ```C++
-Json j(Json::kArray);
+Json j;  // 或者明确指明类型 Json j(Json::kArray);
 
 j[0] = "hello";
 j[1] = "world";
@@ -98,7 +96,7 @@ Json::ArrayType &array_value = j.GetArray();
 ##### 方式一
 
 ```C++
-Json json_object(Json::kObject);
+Json json_object;  // 或者明确指明类型 Json json_object(Json::kObject);
 json_object["null"] = Json();
 json_object["bool"] = true;
 json_object["value"] = 42;

@@ -50,6 +50,60 @@ TEST(JsonConstructor, TypeConstructorInitState) {
   EXPECT_EQ(object_value.size(), 0);
 };
 
+// 测试类型转换
+TEST(JsonTypeTest, TypeConversion) {
+  Json json;  // 不指定类型时，默认是null类型
+
+  // null转换为array
+  json[1] = 12;
+  EXPECT_TRUE(json.IsArray());
+  EXPECT_EQ(json, Json({Json(), 12}));
+  EXPECT_NE(json, Json({Json(), 13}));
+  json = {};
+
+  // null转换为object
+  json["hello"] = "json";
+  EXPECT_TRUE(json.IsObject());
+  EXPECT_EQ(json, Json(Json::ObjectType{{"hello", "json"}}));
+  EXPECT_NE(json, Json(Json::ObjectType{{"hello", "world"}}));
+
+  // 转换为bool类型
+  json = true;
+  EXPECT_TRUE(json.IsBool());
+  EXPECT_EQ(json, true);
+  EXPECT_NE(json, false);
+
+  // 转换为integer类型
+  json = 42;
+  EXPECT_TRUE(json.IsInteger());
+  EXPECT_EQ(json, 42);
+  EXPECT_NE(json, 24);
+
+  // 转换为double类型
+  json = 42.42;
+  EXPECT_TRUE(json.IsDouble());
+  EXPECT_EQ(json, 42.42);
+  EXPECT_NE(json, 42.24);
+
+  // 转换为string类型
+  json = "hello json";
+  EXPECT_TRUE(json.IsString());
+  EXPECT_EQ(json, "hello json");
+  EXPECT_NE(json, "hello world");
+
+  // 转换为array类型
+  json = {42, 3.14, false, "json"};
+  EXPECT_TRUE(json.IsArray());
+  EXPECT_EQ(json, Json({42, 3.14, false, "json"}));
+  EXPECT_NE(json, Json({42, 3.14, false, "jsan"}));
+
+  // 转换为object类型
+  json = Json::ObjectType{{"type", "json"}, {"value", 42}};
+  EXPECT_TRUE(json.IsObject());
+  EXPECT_EQ(json, Json(Json::ObjectType{{"type", "json"}, {"value", 42}}));
+  EXPECT_NE(json, Json(Json::ObjectType{{"type", "json"}, {"value", 42.2}}));
+};
+
 // 测试null类型
 TEST(JsonTypeTest, NullType) {
   Json json_default;
