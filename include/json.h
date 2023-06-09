@@ -40,8 +40,9 @@ class Json final {
   Json(const char *value);
   Json(const std::string &value);
   Json(const std::initializer_list<Json> &li);
-  // 注意是const std::string，否则编译不通过
-  Json(const std::initializer_list<std::pair<const std::string, Json>> &li);
+  // 使用初始化列表构造object对象时会与array的构造函数冲突，故删除
+  // Json(const std::initializer_list<std::pair<const std::string, Json>> &li);
+  Json(const ObjectType &value);
 
   // 赋值运算符通常是返回该对象的引用
   Json &operator=(const Json &rhs);

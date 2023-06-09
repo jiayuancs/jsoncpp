@@ -3,6 +3,7 @@
 #include "json.h"
 
 #include <iostream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -11,7 +12,7 @@
 using namespace jiayuancs::jsoncpp;
 using namespace std;
 
-TEST(JsonConstructor, TypeConstructor) {
+TEST(JsonConstructor, TypeConstructorInitState) {
   Json json_default;
   EXPECT_TRUE(json_default.IsNull());
 
@@ -72,6 +73,9 @@ TEST(JsonTypeTest, ArrayType) {
   Json json_default = {
       Json(), true, 1, 2.0, "3", {"array", 1, 2, 3}, Json(Json::kObject)};
 
+  EXPECT_THROW(json_default.GetObject(), logic_error);
+  EXPECT_THROW(json_default["hello"], logic_error);
+
   Json json_array(Json::kArray);
   json_array[5] = {"array", 1, 2, 3};
   json_array[0] = Json();
@@ -82,6 +86,7 @@ TEST(JsonTypeTest, ArrayType) {
   json_array[6] = Json(Json::kObject);
 
   EXPECT_EQ(json_array, json_default);
+  EXPECT_EQ(json_array.GetConstArray(), json_default.GetConstArray());
   EXPECT_EQ(json_array.dump(), json_default.dump());
 
   json_default[2] = "hello";
@@ -90,6 +95,33 @@ TEST(JsonTypeTest, ArrayType) {
   json_default = {};
   EXPECT_TRUE(json_default.IsNull());
 }
+
+// 测试object类型
+TEST(JsonTypeTest, ObjectType) {
+  Json::ObjectType value = {{"null", Json()},
+                            {"bool", true},
+                            {"value", 42},
+                            {"double", 3.14},
+                            {"hello", "world"},
+                            {"array", {1, 2, 3, 3.4, true}},
+                            {"object", Json(Json::kObject)}};
+  Json json_object(value);
+  EXPECT_EQ(json_object.GetConstObject(), value);
+
+  Json json_default(Json::kObject);
+  json_default["null"] = Json();
+  json_default["bool"] = true;
+  json_default["value"] = 42;
+  json_default["double"] = 3.14;
+  json_default["hello"] = "world";
+  json_default["array"] = {1, 2, 3, 3.4, true};
+  EXPECT_NE(json_default, json_object);
+  json_default["object"] = Json(Json::kObject);
+  EXPECT_EQ(json_default, json_object);
+
+  json_default = {};
+  EXPECT_TRUE(json_default.IsNull());
+};
 
 // 测试序列化为字符串
 TEST(JsonDumpTest, DumpTest) {

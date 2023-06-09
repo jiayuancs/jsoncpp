@@ -105,8 +105,8 @@ Json::Json(const std::string &value)
 Json::Json(const std::initializer_list<Json> &li)
     : type_(kArray), array_pointer_(new ArrayType(li)) {}
 
-Json::Json(const std::initializer_list<std::pair<const std::string, Json>> &li)
-    : type_(kObject), object_pointer_(new ObjectType(li)) {}
+Json::Json(const ObjectType &value)
+    : type_(kObject), object_pointer_(new ObjectType(value)) {}
 
 Json &Json::operator=(const Json &rhs) {
   // 处理自我赋值
