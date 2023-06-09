@@ -63,6 +63,31 @@ Json::Json() : type_(kNull) {}
 
 Json::Json(const Json &json) : type_(json.type_) { copy(json); }
 
+Json::Json(JsonType json_type) : type_(json_type) {
+  switch (json_type) {
+    case kBool:
+      bool_value_ = false;
+      break;
+    case kInt:
+      int_value_ = 0;
+      break;
+    case kDouble:
+      double_value_ = 0.0;
+      break;
+    case kString:
+      string_pointer_ = new std::string();
+      break;
+    case kArray:
+      array_pointer_ = new ArrayType();
+      break;
+    case kObject:
+      object_pointer_ = new ObjectType();
+      break;
+    default:
+      break;
+  }
+}
+
 Json::Json(bool value) : type_(kBool), bool_value_(value) {}
 
 Json::Json(int value) : type_(kInt), int_value_(value) {}
@@ -129,14 +154,6 @@ Json &Json::operator[](const std::string &key) {
   return (*object_pointer_)[key];
 }
 
-void Json::push_back(Json &json) {
-  if (type_ != kArray) {
-    throw std::logic_error(
-        "function Json::push_back(Json &) type error, requires array");
-  }
-  array_pointer_->push_back(json);
-}
-
 std::string Json::dump(unsigned indent) const {
   std::ostringstream oss;
   dump(oss, indent);
@@ -188,14 +205,14 @@ void Json::dump(std::ostream &os, unsigned indent) const {
   }
 }
 
-bool Json::GetBool() {
+const bool Json::GetBool() const {
   if (type_ != kBool) {
     throw std::logic_error("function Json::GetBool() type error, require bool");
   }
   return bool_value_;
 }
 
-long long Json::GetInteger() {
+const long long Json::GetInteger() const {
   if (type_ != kInt) {
     throw std::logic_error(
         "function Json::GetInteger() type error, require Integer");
@@ -203,7 +220,7 @@ long long Json::GetInteger() {
   return int_value_;
 }
 
-double Json::GetDouble() {
+const double Json::GetDouble() const {
   if (type_ != kDouble) {
     throw std::logic_error(
         "function Json::GetDouble() type error, require double");
@@ -211,12 +228,44 @@ double Json::GetDouble() {
   return double_value_;
 }
 
-std::string Json::GetString() {
+const std::string &Json::GetString() const {
   if (type_ != kString) {
     throw std::logic_error(
         "function Json::GetString() type error, require string");
   }
   return *string_pointer_;
+}
+
+Json::ArrayType &Json::GetArray() {
+  if (type_ != kArray) {
+    throw std::logic_error(
+        "function Json::GetArray() type error, requires array");
+  }
+  return *array_pointer_;
+}
+
+const Json::ArrayType &Json::GetConstArray() const {
+  if (type_ != kArray) {
+    throw std::logic_error(
+        "function Json::GetConstArray() type error, requires array");
+  }
+  return *array_pointer_;
+}
+
+Json::ObjectType &Json::GetObject() {
+  if (type_ != kObject) {
+    throw std::logic_error(
+        "function Json::GetObject() type error, requires object");
+  }
+  return *object_pointer_;
+}
+
+const Json::ObjectType &Json::GetConstObject() const {
+  if (type_ != kObject) {
+    throw std::logic_error(
+        "function Json::GetConstObject() type error, requires object");
+  }
+  return *object_pointer_;
 }
 
 void Json::clear() {

@@ -25,9 +25,14 @@ class Json final {
   friend std::ostream &operator<<(std::ostream &os, const Json &rhs);
 
  public:
+  typedef std::vector<Json> ArrayType;
+  typedef std::map<std::string, Json> ObjectType;
+  enum JsonType { kNull, kBool, kInt, kDouble, kString, kArray, kObject };
+
   // 构造函数
   Json();
   Json(const Json &json);
+  Json(JsonType json_type);
   Json(bool value);
   Json(int value);
   Json(long long value);
@@ -55,8 +60,6 @@ class Json final {
   Json &operator[](const std::string &key);
 
   // 其他函数
-  // 向array尾部添加元素
-  void push_back(Json &json);
   // 序列化字符串，缩进为indent
   std::string dump(unsigned indent = 0) const;
   void dump(std::ostream &os, unsigned indent = 0) const;
@@ -69,21 +72,26 @@ class Json final {
   bool IsArray() { return type_ == kArray; }
   bool IsObject() { return type_ == kObject; }
 
-  bool GetBool();
-  long long GetInteger();
-  double GetDouble();
-  std::string GetString();
+  const bool GetBool() const;
+  const long long GetInteger() const;
+  const double GetDouble() const;
+  const std::string &GetString() const;
+
+  // Array操作
+  ArrayType &GetArray();
+  const ArrayType &GetConstArray() const;
+
+  // Object操作
+  ObjectType &GetObject();
+  const ObjectType &GetConstObject() const;
 
  private:
-  typedef std::vector<Json> ArrayType;
-  typedef std::map<std::string, Json> ObjectType;
-
   // 释放内存，类型置为kNull
   void clear();
   // 深拷贝
   void copy(const Json &json);
 
-  enum { kNull, kBool, kInt, kDouble, kString, kArray, kObject } type_;
+  JsonType type_;
   union {
     bool bool_value_;
     long long int_value_;
