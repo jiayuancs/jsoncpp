@@ -3,7 +3,7 @@
 ## TODO
 
 - [ ] dump实现缩进
-- [*] 针对转义字符，dump应该输出带有反斜杠的字符，而不是转义字符实际代表的字符
+- [x] 针对转义字符，dump应该输出带有反斜杠的字符，而不是转义字符实际代表的字符
 - [ ] 实现bool、long long、double、string的基本运算，示例如下：
   ```C++
   json j = 42;
@@ -11,11 +11,11 @@
   j = "hello"
   j += " world";
   ```
-- [*] 实现JSON解析器，能够从流中读取JSON字符串并解析为`Json`对象
+- [x] 实现JSON解析器，能够从流中读取JSON字符串并解析为`Json`对象
 - [ ] 暂不支持`\u`转义字符
-- [*] 完成ParserArray和ParserObject
+- [x] 完成ParserArray和ParserObject
 - [ ] valgrind测试不通过
-
+- [ ] 暂不支持注释
 
 ## 环境
 
