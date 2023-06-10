@@ -20,7 +20,8 @@ class Parser final {
   Json Parse();
 
  private:
-  void SkipSpace();
+  inline void SkipSpace();
+  inline int GetNextToken();
   inline void ThrowError(const char *info_str);
   inline void ThrowError(const char *info_str, const char value);
   inline void ThrowError(const char *info_str, const char *value);
@@ -28,7 +29,7 @@ class Parser final {
   Json ParseNull();
   Json ParseBool(bool value);
   Json ParseNumber(bool positive);
-  Json ParseString();
+  std::string ParseString();
   Json ParseArray();
   Json ParseObject();
 

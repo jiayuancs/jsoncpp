@@ -12,8 +12,7 @@ Parser::~Parser() {
 }
 
 Json Parser::Parse() {
-  SkipSpace();
-  int token = in_str_->get();
+  int token = GetNextToken();
   switch (token) {
     case 'n':
       in_str_->putback(token);
@@ -39,7 +38,7 @@ Json Parser::Parse() {
       in_str_->putback(token);
       return ParseNumber(true);
     case '\"':
-      return ParseString();
+      return Json(ParseString());
     case '[':
       return ParseArray();
     case '{':
@@ -51,6 +50,7 @@ Json Parser::Parse() {
   }
 
   ThrowError("unexpected character ", token);
+  return Json();
 }
 
 void Parser::SkipSpace() {
@@ -66,6 +66,11 @@ void Parser::SkipSpace() {
       break;
     }
   }
+}
+
+int Parser::GetNextToken() {
+  SkipSpace();
+  return in_str_->get();
 }
 
 void Parser::ThrowError(const char *info_str) {
@@ -97,6 +102,7 @@ Json Parser::ParseNull() {
   }
 
   ThrowError("expected null, but was ", buf);
+  return Json();
 }
 
 Json Parser::ParseBool(bool value) {
@@ -116,6 +122,7 @@ Json Parser::ParseBool(bool value) {
   }
 
   ThrowError("expected bool value (true or false), but was ", buf);
+  return Json();
 }
 
 Json Parser::ParseNumber(bool positive) {
@@ -159,7 +166,7 @@ Json Parser::ParseNumber(bool positive) {
   return Json(numerator);  // 整数
 }
 
-Json Parser::ParseString() {
+std::string Parser::ParseString() {
   int token = EOF;
   bool valid = false;
   std::string str_value = "";
@@ -210,18 +217,76 @@ Json Parser::ParseString() {
   }
 
   if (valid) {
-    return Json(str_value);
+    return str_value;
   }
 
   ThrowError("invalid string");
+  return "";
 }
 
 Json Parser::ParseArray() {
-  // TODO
+  int token = GetNextToken();
+
+  Json json_array = Json(Json::kArray);
+  if (token == ']') {
+    return json_array;
+  }
+
+  in_str_->putback(token);
+
+  for (int idx = 0;; ++idx) {
+    json_array[idx] = Parse();
+
+    token = GetNextToken();
+
+    if (token == ']') {
+      break;
+    }
+
+    if (token != ',') {
+      ThrowError("invalid array");
+    }
+  }
+
+  return json_array;
 }
 
 Json Parser::ParseObject() {
-  // TODO
+  int token = GetNextToken();
+
+  Json json_object = Json(Json::kObject);
+  if (token == '}') {
+    return json_object;
+  }
+
+  in_str_->putback(token);
+
+  std::string key;
+  for (;;) {
+    if ((token = GetNextToken()) != '\"') {
+      ThrowError("expected \'\"\' in object");
+    }
+
+    // 解析key
+    key = ParseString();
+
+    if ((token = GetNextToken()) != ':') {
+      ThrowError("expected \':\' in object");
+    }
+
+    // 解析value
+    json_object[key] = Parse();
+
+    token = GetNextToken();
+    if (token == '}') {
+      break;
+    }
+    if (token != ',') {
+      ThrowError("expected \',\' in object");
+    }
+  }
+
+  return json_object;
 }
 
 }  // namespace jsoncpp

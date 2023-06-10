@@ -118,8 +118,6 @@ TEST(JsonTypeTest, NullType) {
   EXPECT_EQ(json_default.dump(), "null");
   EXPECT_EQ(json_null.dump(), "null");
   EXPECT_EQ(json_null_2.dump(), "null");
-
-  cout << json_default << " == " << json_null << endl;
 };
 
 // 测试array类型
@@ -200,5 +198,11 @@ TEST(JsonDumpTest, DumpTest) {
   json_array[5]["tag"] = "object";
   json_array[5]["value"] = 42;
 
-  cout << json_array << endl;
+  const string target =
+      "[{\"hello\" : \"world\", \"karray\" : [1, 2, 3, \"ceshi\", 34.4, true, "
+      "null, [[1, 2], [\"3\", 4]], [\"nihao\", \"shijie\", [1, 2, 3], "
+      "\"hello\"], {}], \"kbool\" : false, \"kdouble\" : 23.4, \"kint\" : 42, "
+      "\"knull\" : null}, 42, 24.42, false, [1, 2, 3], {\"tag\" : \"object\", "
+      "\"value\" : 42}]";
+  EXPECT_EQ(json_array.dump(), target);
 };

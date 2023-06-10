@@ -191,7 +191,7 @@ void Json::dump(std::ostream &os, unsigned indent) const {
       os << double_value_;
       break;
     case kString:
-      os << "\"" + (*string_pointer_) + "\"";
+      os << R"(")" + (*string_pointer_) + R"(")";  // 不转义字符串中的特殊字符
       break;
     case kArray:
       os << "[";
@@ -211,7 +211,7 @@ void Json::dump(std::ostream &os, unsigned indent) const {
         if (it != object_pointer_->cbegin()) {
           os << ", ";
         }
-        os << it->first << " : ";
+        os << R"(")" << it->first << R"(" : )";  // 不转义字符串中的特殊字符
         it->second.dump(os, indent);
       }
       os << "}";

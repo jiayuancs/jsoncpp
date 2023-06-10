@@ -94,8 +94,8 @@ TEST(ParserTest, ArrayTest) {
   Json json;
 
   json = Parser(
-             "[null, true, 12, 24.12, \"hello world\", {{\"tag\", \"json\"}, "
-             "{\"value\",  42}, {\"array\", [null  , true, 12 , 24.12]}}]")
+             "[null, true, 12, 24.12, \"hello world\", {\"tag\": \"json\", "
+             "\"value\":  42, \"array\": [null  , true, 12 , 24.12]}]")
              .Parse();
   EXPECT_TRUE(json.IsArray());
 
@@ -117,10 +117,10 @@ TEST(ParserTest, ObjectTest) {
   Json json;
 
   json = Parser(
-             "\"{\"knull\": null,\"kInt\": 432, \"kDouble\": "
+             "{\"knull\": null,\"kInt\": 432, \"kDouble\": "
              "234.23,\"kString\": \"hello world\",\"kArray\": [1, true, "
              "3],\"kObject\": {\"knull\": null,\"kInt\": 432,\"kDouble\": "
-             "234.23,\"kString\": \"hello world\",\"kArray\": [1, true, 3]}}\"")
+             "234.23,\"kString\": \"hello world\",\"kArray\": [1, true, 3]}}")
              .Parse();
   EXPECT_TRUE(json.IsObject());
 
@@ -133,7 +133,6 @@ TEST(ParserTest, ObjectTest) {
                                        {"kDouble", 234.23},
                                        {"kString", "hello world"},
                                        {"kArray", {1, true, 3}}};
-  cout << target << endl;
   EXPECT_EQ(json, target);
 
   EXPECT_THROW(Parser("{").Parse(), logic_error);
@@ -144,4 +143,32 @@ TEST(ParserTest, ObjectTest) {
   EXPECT_THROW(Parser("{\"1\": 2, \"true\"}").Parse(), logic_error);
   EXPECT_THROW(Parser("{1, 2}").Parse(), logic_error);
   EXPECT_THROW(Parser("{1: 2}").Parse(), logic_error);
+};
+
+TEST(ParserTest, DumpAndParser) {
+  Json json(Json::kObject);
+  json["hello"] = "world";
+  json["kint"] = 42;
+  json["kdouble"] = 23.4;
+  json["kbool"] = false;
+  json["knull"] = Json();
+  json["karray"] = {1,
+                    2,
+                    3,
+                    "ceshi",
+                    34.4,
+                    true,
+                    Json(),
+                    {{1, 2}, {"3", 4}},
+                    {"nihao", "shijie", {1, 2, 3}, "hello"},
+                    Json(Json::kObject)};
+
+  Json json_array = {json, 42, 24.42, false, {1, 2, 3}, Json(Json::kObject)};
+  json_array[5]["tag"] = "object";
+  json_array[5]["value"] = 42;
+
+  string json_str = json_array.dump();
+  Json json_recover = Parser(json_str).Parse();
+
+  EXPECT_EQ(json_array, json_recover);
 };
