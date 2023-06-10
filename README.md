@@ -31,6 +31,27 @@
 valgrind --tool=memcheck ./build/bin/jsoncpp_test
 ```
 
+## 编译
+
+默认构建的是`Debug`版本，可在根目录的`CMakeLists.txt`中修改：
+
+```cmake
+set(CMAKE_BUILD_TYPE Debug)
+# set(CMAKE_BUILD_TYPE Release)
+```
+
+构建`jsoncpp`的命令如下：
+
+```shell
+git clone https://github.com/jiayuancs/jsoncpp.git
+cd jsoncpp
+mkdir build && cd build
+cmake ..
+make
+```
+
+编译得到的静态库文件存放在`build/lib`目录下，名为`libjsoncpp.a`
+
 ## 介绍
 
 `jsoncpp`是一个基于C++11的JSON库，主要包括两个类：
