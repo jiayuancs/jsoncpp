@@ -94,7 +94,7 @@ void Parser::ThrowError(const char *info_str, const char *value) {
 }
 
 Json Parser::ParseNull() {
-  char buf[5];
+  char buf[5] = {0};
   in_str_->read(buf, 4);
   buf[4] = '\0';
   if (strcmp(buf, "null") == 0) {
@@ -106,7 +106,7 @@ Json Parser::ParseNull() {
 }
 
 Json Parser::ParseBool(bool value) {
-  char buf[6];
+  char buf[6] = {0};
   if (value) {
     in_str_->read(buf, 4);
     buf[4] = '\0';

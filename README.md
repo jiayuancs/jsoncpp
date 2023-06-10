@@ -2,28 +2,28 @@
 
 ## TODO
 
-- [ ] dump实现缩进
-- [x] 针对转义字符，dump应该输出带有反斜杠的字符，而不是转义字符实际代表的字符
-- [ ] 实现bool、long long、double、string的基本运算，示例如下：
+- [ ] 增加dump缩进支持
+- [ ] 增加bool、long long、double、string等类型的基本运算支持，示例如下：
   ```C++
   json j = 42;
   j += 2;
   j = "hello"
   j += " world";
   ```
-- [x] 实现JSON解析器，能够从流中读取JSON字符串并解析为`Json`对象
-- [ ] 暂不支持`\u`转义字符
-- [x] 完成ParserArray和ParserObject
-- [ ] valgrind测试不通过
-- [ ] 暂不支持注释
+- [ ] 增加`\u`转义字符支持
+- [ ] 增加注释支持(`//`和`/**/`)
+- [ ] 增加单引号字符串支持(`''`)
 
 ## 环境
 
 - Ubuntu 22.04
 - cmake 3.22.1
 - make 4.3
+- g++ 11.3.0
 - gtest
 - valgrind 3.18.1
+
+使用gtest进行单元测试
 
 使用valgrind测试是否存在内存泄漏
 
@@ -31,22 +31,41 @@
 valgrind --tool=memcheck ./build/bin/jsoncpp_test
 ```
 
+## 介绍
+
+`jsoncpp`是一个基于C++11的JSON库，主要包括两个类：
+
+- `Json`类：实现了JSON数据结构和相应的操作，位于头文件`json.h`
+- `Parser`类：实现反序列化，位于头文件`parser.h`
+
+一个`Json`对象具有6种类型，各类型与C++中类型对应关系如下：
+
+- `null`类型
+- `bool`类型：基于`bool`类型
+- `number`类型：该类型细分为两种类型
+  - `integer`类型：基于`long long`类型
+  - `double`类型：基于`double`类型
+- `string`类型：基于`std::string`类型
+- `array`类型：基于`std::vector<Json>`类型
+- `object`类型：基于`std::map<std::string, Json>`类型
+
 ## 使用方法
 
-动态类型
+各类型的`Json`对象之间可以直接赋值
 
 ```C++
-Json j;         // 不指定类型时，默认是null类型
-Json j7 = {};   // null类型
-Json j8{};      // null类型
-Json j1(Json::kNull);
-Json j2(Json::kInt);
-Json j3(Json::kDouble);
-Json j4(Json::kString);
-Json j5(Json::kArray);
-Json j6(Json::kObject);
+Json j;                 // 不指定类型时，默认是null类型
+Json j1 = {};           // null类型
+Json j2{};              // null类型
+Json j3(Json::kNull);   // null类型
+Json j4(Json::kBool);   // bool类型
+Json j5(Json::kInt);    // integer类型
+Json j6(Json::kDouble); // double类型
+Json j7(Json::kString); // string类型
+Json j8(Json::kArray);  // array类型
+Json j9(Json::kObject); // object类型
 
-// 各类型之间可以通过赋值进行转换
+// 各类型之间可以直接赋值（使用深拷贝）
 
 j = true; // bool类型 
 
@@ -61,6 +80,19 @@ j = {42, 3.14, false, "json"};  // array类型
 j = Json::ObjectType{{"type", "json"}, {"value", 42}};  // object类型
 ```
 
+比较`Json`对象
+
+```C++
+// 只有当j1与j2的类型相同，且值相同时，条件才为真
+j1 == j2;
+
+// 等价于 !(j1 == j2)
+j1 != j2;
+
+// 所有的null类型都是相等的
+Json() == Json();  // return true
+```
+
 ### array类型
 
 #### 构造array类型对象
@@ -68,9 +100,9 @@ j = Json::ObjectType{{"type", "json"}, {"value", 42}};  // object类型
 ##### 方式一
 
 ```C++
-Json j{"hello", "world", "!"};  // j是array类型，只含一个元素
+Json j{"hello", "world", "!", 42};  // j是array类型
 
-j[32] = 4224;     // j[3:32]自动填充为null类型
+j[32] = 4224;     // j[4:32]自动填充为null类型
 ```
 
 ##### 方式二
@@ -136,17 +168,42 @@ Json::ObjectType &map_value = json_object.GetObject();
 
 ### 序列化
 
-提供如下两个函数将`Json`对象序列化为字符串
+`Json`对象提供如下两个成员函数实现将当前对象序列化为字符串
 
 ```C++
 std::string dump(unsigned indent = 0) const;
 void dump(std::ostream &os, unsigned indent = 0) const;
 ```
 
+示例：
+
+```C++
+string str_value = json_object.dump();
+```
+
 `Json`对象可直接输出
 
 ```C++
 std::cout << json_object;
+```
+
+### 反序列化
+
+类`Parser`用于反序列化，有两种方法：
+
+方法一：JSON字符串反序列化为`Json`对象
+
+```C++
+// string
+Json json_object = Parser("[null, true, 12, 24.12]").Parse();
+```
+
+方法二：从输入流(`istream`)中读取JSON字符串，反序列化为`Json`对象
+
+```C++
+// istream (以ifstream为例)
+ifstream ifs("./data.json");
+Json json_object = Parser(ifs).Parse();
 ```
 
 ### 注意
@@ -167,4 +224,8 @@ json = Parser("43224fa34").Parse();  // 匹配前缀43224，得到integer类型
 json = Parser("432.24fa34").Parse(); // 匹配前缀432.24，得到double类型
 
 json = Parser("\"hello world\"sdfj").Parse();  // 匹配前缀"hello world"，得到string类型
+
+json = Parser("[1, 2, 3]sdfj").Parse();  // 匹配前缀"[1, 2, 3]"，得到array类型
+
+json = Parser("{\"type\": 23}sdfj").Parse();  // 匹配前缀"{"type": 23}"，得到object类型
 ```
