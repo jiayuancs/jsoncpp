@@ -68,11 +68,6 @@ void Parser::SkipSpace() {
   }
 }
 
-int Parser::GetNextToken() {
-  SkipSpace();
-  return in_str_->get();
-}
-
 void Parser::ThrowError(const char *info_str) {
   std::ostringstream error_info;
   error_info << "syntax error in line " << line_no_ << ": " << info_str;
@@ -161,7 +156,9 @@ Json Parser::ParseNumber(bool positive) {
 
   numerator *= sign;
   if (dot_flag) {  // 浮点数
-    return Json((double)numerator / (double)denominator);
+    // C语言风格的强制类型转换
+    // return Json((double)numerator / (double)denominator);
+    return Json(static_cast<double>(numerator) / denominator);
   }
   return Json(numerator);  // 整数
 }

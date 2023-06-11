@@ -139,6 +139,7 @@ TEST(JsonTypeTest, ArrayType) {
 
   EXPECT_EQ(json_array, json_default);
   EXPECT_EQ(json_array.GetConstArray(), json_default.GetConstArray());
+  EXPECT_EQ(json_array.GetArray(), json_default.GetConstArray());
   EXPECT_EQ(json_array.dump(), json_default.dump());
 
   json_default[2] = "hello";
@@ -159,6 +160,8 @@ TEST(JsonTypeTest, ObjectType) {
                             {"object", Json(Json::kObject)}};
   Json json_object(value);
   EXPECT_EQ(json_object.GetConstObject(), value);
+  EXPECT_EQ(json_object.GetObject(), value);
+  EXPECT_THROW(json_object.GetArray(), logic_error);
 
   Json json_default(Json::kObject);
   json_default["null"] = Json();

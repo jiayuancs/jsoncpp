@@ -253,11 +253,10 @@ const std::string &Json::GetString() const {
 }
 
 Json::ArrayType &Json::GetArray() {
-  if (type_ != kArray) {
-    throw std::logic_error(
-        "function Json::GetArray() type error, requires array");
-  }
-  return *array_pointer_;
+  const ArrayType &array_ref = GetConstArray();
+  // 使用const_cast去重常量属性
+  // 因为array_pointer_指向的数组本身是非常量的，因此这种转换是合法的
+  return const_cast<ArrayType &>(array_ref);
 }
 
 const Json::ArrayType &Json::GetConstArray() const {
@@ -269,11 +268,8 @@ const Json::ArrayType &Json::GetConstArray() const {
 }
 
 Json::ObjectType &Json::GetObject() {
-  if (type_ != kObject) {
-    throw std::logic_error(
-        "function Json::GetObject() type error, requires object");
-  }
-  return *object_pointer_;
+  const ObjectType &object_ref = GetConstObject();
+  return const_cast<ObjectType &>(object_ref);
 }
 
 const Json::ObjectType &Json::GetConstObject() const {

@@ -4,6 +4,9 @@
 #define JSONCPP_INCLUDE_PARSER_H_
 
 #include <sstream>
+#ifndef NDEBUG
+#include <iostream>
+#endif  // NDEBUG
 
 #include "json.h"
 
@@ -20,11 +23,24 @@ class Parser final {
   Json Parse();
 
  private:
-  inline void SkipSpace();
-  inline int GetNextToken();
-  inline void ThrowError(const char *info_str);
-  inline void ThrowError(const char *info_str, const char value);
-  inline void ThrowError(const char *info_str, const char *value);
+  void SkipSpace();
+  // 内联函数应定义(而不是仅声明)在头文件中
+  int GetNextToken() {
+    SkipSpace();
+#ifndef NDEBUG
+    int ch_debug = in_str_->peek();
+    if (ch_debug == EOF) {
+      std::clog << "EOF";
+    } else {
+      std::clog << static_cast<char>(ch_debug);
+    }
+    std::clog << std::endl;
+#endif  // NDEBUG
+    return in_str_->get();
+  }
+  void ThrowError(const char *info_str);
+  void ThrowError(const char *info_str, const char value);
+  void ThrowError(const char *info_str, const char *value);
 
   Json ParseNull();
   Json ParseBool(bool value);
