@@ -33,11 +33,14 @@ valgrind --tool=memcheck ./build/bin/jsoncpp_test
 
 ## 编译
 
-默认构建的是`Debug`版本，可在根目录的`CMakeLists.txt`中修改：
+默认构建类型为`Debug`，且自动构建测试代码，可在根目录的`CMakeLists.txt`中修改：
 
 ```cmake
 set(CMAKE_BUILD_TYPE Debug)
 # set(CMAKE_BUILD_TYPE Release)
+
+option(BUILD_TEST_CODE "是否构建测试代码" ON)
+# option(BUILD_TEST_CODE "是否构建测试代码" OFF)
 ```
 
 构建`jsoncpp`的命令如下：
@@ -52,12 +55,14 @@ make
 
 编译得到的静态库文件存放在`build/lib`目录下，名为`libjsoncpp.a`
 
+如果设置了`BUILD_TEST_CODE=ON`，则生成的可执行测试程序存放在`build/bin`目录下，名为`jsoncpp_test`
+
 ## 介绍
 
 `jsoncpp`是一个基于C++11的JSON库，主要包括两个类：
 
-- `Json`类：实现了JSON数据结构和相应的操作，位于头文件`json.h`
-- `Parser`类：实现反序列化，位于头文件`parser.h`
+- `jiayuancs::jsoncpp::Json`类：实现了JSON数据结构和相应的操作，位于头文件`json.h`
+- `jiayuancs::jsoncpp::Parser`类：实现反序列化，位于头文件`parser.h`
 
 一个`Json`对象具有6种类型，各类型与C++中类型对应关系如下：
 

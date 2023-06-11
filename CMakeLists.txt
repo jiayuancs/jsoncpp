@@ -6,8 +6,11 @@ project(jsoncpp "CXX")
 # 本项目基于C++11，但是gtest要求版本不得低于C++14，所以这里指定为C++14
 set(CMAKE_CXX_STANDARD 14)
 
-# 调试模式
+# 构建模式：Debug, Release, ...
 set(CMAKE_BUILD_TYPE Debug)
+
+# 是否构建测试代码(ON/OFF)
+option(BUILD_TEST_CODE "是否构建测试代码" ON)
 
 # ------------------- JSONCPP ----------------------
 
@@ -27,8 +30,8 @@ set(TEST_EXE_PATH ${CMAKE_BINARY_DIR}/bin)
 # 第三方库 gtest
 set(THIRD_PARTY_GTEST ${CMAKE_CURRENT_SOURCE_DIR}/third_party/gtest)
 
-# 如果是Debug模式，则构建测试代码
-if(${CMAKE_BUILD_TYPE} STREQUAL Debug)
-  message(STATUS "测试模式：构建测试代码")
+# 构建测试代码
+if(${BUILD_TEST_CODE})
+  message(STATUS "构建测试代码")
   add_subdirectory(test)
 endif()
